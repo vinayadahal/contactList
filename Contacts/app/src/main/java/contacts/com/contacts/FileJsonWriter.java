@@ -125,6 +125,7 @@ public class FileJsonWriter extends Activity {
 
                 TextView txtView = new TextView(this);
                 txtView.setText(objJson.getString("name") + " " + objJson.getString("phone"));
+                txtView.setPadding(10, 5, 10, 5);
                 layout.addView(txtView);
                 textList.add(txtView);
             }
