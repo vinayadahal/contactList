@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary"
+    android:padding="0dp"
+    android:weightSum="1">
+
+
+    <Button
+        android:id="@+id/btn_go_back"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:onClick="GoBack"
+        android:text="@string/arrow_left"
+        android:textColor="#fff"
+        android:textSize="20dp"
+        android:background="@color/colorPrimary"/>
+
+    <Button
+        android:id="@+id/btn_download"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="DownloadFile"
+        android:text="@string/download_btn"
+        android:textColor="#fff"
+        android:textSize="20dp"
+        android:background="@color/colorPrimary"/>
+
+
+    <TextView
+        android:id="@+id/txtHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="60dp"
+        android:paddingTop="15dp"
+        android:textColor="#fff"
+        android:text="Contact List" />
+
+    <LinearLayout
+        android:id="@+id/lnrLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/btn_go_back"
+        android:background="@color/colorBackground"
+        android:orientation="vertical">
+
+        <!--<TextView-->
+            <!--android:id="@+id/textViewPage2"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@+id/btn_go_back" />-->
+    </LinearLayout>
+
+</RelativeLayout>
+
+
