@@ -3,14 +3,20 @@ package contacts.com.contacts;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -27,7 +33,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class FileJsonWriter extends Activity {
 
@@ -47,7 +52,7 @@ public class FileJsonWriter extends Activity {
     public void DownloadFile(View view) {
         URL url = null;
         try {
-            url = new URL("http://192.168.1.3/api");
+            url = new URL("http://192.168.1.4/api");
         } catch (MalformedURLException ex) {
             System.out.println("Caught Exception URL: " + ex);
         }
@@ -57,38 +62,36 @@ public class FileJsonWriter extends Activity {
             StrictMode.setThreadPolicy(policy);
         }
 
-        String result = null;
         try {
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(200);
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String line = null;
+            StringBuilder textData = new StringBuilder();
+            String line;
             while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
+                textData.append(line + "\n");
             }
-            result = sb.toString();
-            WriteToFile(result);
+
+            WriteToFile(textData);
             int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this, "File downloaded successfully", duration);
+            Toast toast = Toast.makeText(this, "Contact list downloaded successfully", duration);
             toast.show();
             readFile();
-
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             System.out.println("Caught Exception IO: " + ex);
             int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(this, "Unable to fetch data from server", duration);
+            Toast toast = Toast.makeText(this, "Unable to fetch contact list from server", duration);
             toast.show();
         }
     }
 
 
-    public void WriteToFile(String data) {
+    public void WriteToFile(StringBuilder data) {
         String filename = "Contacts";
         FileOutputStream outputStream;
         try {
             outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-            outputStream.write(data.getBytes());
+            outputStream.write(data.toString().getBytes());
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,36 +110,67 @@ public class FileJsonWriter extends Activity {
                 text.append('\n');
             }
             br.close();
+            createContactList(text);
         } catch (IOException e) {
             System.out.println("exception ----------------> " + e);
+            Toast.makeText(this, "Contact list missing. Please re-download.", Toast.LENGTH_LONG).show();
         }
+    }
 
+    public void createContactList(StringBuilder text) {
         try {
             JSONArray jArray = new JSONArray(text.toString());
             System.out.println(jArray.length());
 
-            List<TextView> textList = new ArrayList<>(jArray.length());
             LinearLayout layout = (LinearLayout) findViewById(R.id.lnrLayout);
+
+            ArrayList user_id = new ArrayList<>();
+            final ArrayList names = new ArrayList<>();
+            final ArrayList phone = new ArrayList<>();
 
             for (int i = 0; i < jArray.length(); i++) {
                 JSONObject objJson = jArray.getJSONObject(i);
-                System.out.println(objJson.getString("name"));
-                System.out.println(objJson.getString("phone"));
-
-                TextView txtView = new TextView(this);
-                txtView.setText(objJson.getString("name") + " " + objJson.getString("phone"));
-                txtView.setPadding(10, 5, 10, 5);
-                layout.addView(txtView);
-                textList.add(txtView);
+                user_id.add(objJson.getString("id"));
+                names.add(objJson.getString("name"));
+                phone.add(objJson.getString("phone"));
             }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, names);
+            final ListView listView = new ListView(this);
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    int itemPosition = position;
+                    Toast.makeText(getApplicationContext(), "Calling: " + names.get(itemPosition), Toast.LENGTH_SHORT).show();
+                    callHotline(phone.get(itemPosition).toString());
+//                    showPopUp();
+                }
+            });
+
+            layout.removeAllViews();
+            layout.addView(listView);
         } catch (JSONException ex) {
             System.out.println(ex);
         }
-
-//        TextView tv = (TextView) findViewById(R.id.textViewPage2);
-//        tv.setText(text);
+    }
 
 
+//    public void showPopUp() {
+//        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        PopupWindow pw = new PopupWindow(inflater.inflate(R.layout.choice_pop_up, null, false), 100, 100, true);
+//        pw.showAtLocation(this.findViewById(R.id.lnrLayout), Gravity.CENTER, 0, 0);
+//    }
+
+
+    public void callHotline(String phone) {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel:" + phone));
+        try {
+            startActivity(callIntent);
+        } catch (SecurityException ex) {
+            System.out.println(ex);
+        }
     }
 
     public void GoBack(View view) {
