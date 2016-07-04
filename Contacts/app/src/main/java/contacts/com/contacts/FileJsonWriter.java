@@ -8,8 +8,13 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ActionMenuView;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,12 +39,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class FileJsonWriter extends Activity {
+public class FileJsonWriter extends AppCompatActivity{
+
+    private ActionMenuView amvMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.click_layout);
+        Toolbar Actionbar = (Toolbar) findViewById(R.id.action_bar);
+        setSupportActionBar(Actionbar);
+        amvMenu = (ActionMenuView) Actionbar.findViewById(R.id.amvMenu);
+
         //adding font icons to project
         Typeface font = Typeface.createFromAsset(this.getAssets(), "fonts/fontawesome-webfont.ttf");
         Button btn_go_back = (Button) findViewById(R.id.btn_go_back);
@@ -49,10 +60,19 @@ public class FileJsonWriter extends Activity {
         readFile();
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        System.out.println("called>>>>>>>>>>>>>menu");
+        // Inflate the menu; this adds items to the action bar if it is present.
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.app_bar_btn, amvMenu.getMenu());
+        return true;
+    }
+
     public void DownloadFile(View view) {
         URL url = null;
         try {
-            url = new URL("http://192.168.1.4/api");
+            url = new URL("http://192.168.1.5/api");
         } catch (MalformedURLException ex) {
             System.out.println("Caught Exception URL: " + ex);
         }
@@ -144,7 +164,7 @@ public class FileJsonWriter extends Activity {
                     int itemPosition = position;
                     Toast.makeText(getApplicationContext(), "Calling: " + names.get(itemPosition), Toast.LENGTH_SHORT).show();
                     callHotline(phone.get(itemPosition).toString());
-//                    showPopUp();
+                    showPopUp();
                 }
             });
 
@@ -156,11 +176,11 @@ public class FileJsonWriter extends Activity {
     }
 
 
-//    public void showPopUp() {
-//        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        PopupWindow pw = new PopupWindow(inflater.inflate(R.layout.choice_pop_up, null, false), 100, 100, true);
-//        pw.showAtLocation(this.findViewById(R.id.lnrLayout), Gravity.CENTER, 0, 0);
-//    }
+    public void showPopUp() {
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        PopupWindow pw = new PopupWindow(inflater.inflate(R.layout.choice_pop_up, null, false), 100, 100, true);
+        pw.showAtLocation(this.findViewById(R.id.lnrLayout), Gravity.CENTER, 0, 0);
+    }
 
 
     public void callHotline(String phone) {

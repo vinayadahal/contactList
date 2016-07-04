@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/action_bar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/colorPrimary"
+    android:elevation="4dp"
+    app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
+    app:titleTextColor="#fff">
+
+    <android.support.v7.widget.ActionMenuView
+        android:id="@+id/amvMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="left"
+        />
+
+
+</android.support.v7.widget.Toolbar>

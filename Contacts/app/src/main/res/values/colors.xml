@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorBackground">#FFFFFF</color>
-    <color name="colorTxtViewList">#CCCCCC</color>
+    <color name="colorTextForDark">#FFFFFF</color>
+    <color name="colorTextForLight">#000000</color>
 </resources>

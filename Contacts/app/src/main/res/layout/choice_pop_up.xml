@@ -10,6 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
         android:text="Test Pop-Up"
-        android:background="@color/colorTxtViewList"/>
+        android:background="#ccc"/>
 
 </LinearLayout>
