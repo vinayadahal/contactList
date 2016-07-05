@@ -39,9 +39,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class FileJsonWriter extends AppCompatActivity{
+public class FileJsonWriter extends AppCompatActivity {
 
-    private ActionMenuView amvMenu;
+    private ActionMenuView amvMenuBackBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,8 @@ public class FileJsonWriter extends AppCompatActivity{
         setContentView(R.layout.click_layout);
         Toolbar Actionbar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(Actionbar);
-        amvMenu = (ActionMenuView) Actionbar.findViewById(R.id.amvMenu);
+        getSupportActionBar().setTitle(null);
+//        amvMenuBackBtn = (ActionMenuView) Actionbar.findViewById(R.id.amvMenu); //for setting arrow to left side
 
         //adding font icons to project
         Typeface font = Typeface.createFromAsset(this.getAssets(), "fonts/fontawesome-webfont.ttf");
@@ -65,7 +66,14 @@ public class FileJsonWriter extends AppCompatActivity{
         System.out.println("called>>>>>>>>>>>>>menu");
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.app_bar_btn, amvMenu.getMenu());
+        inflater.inflate(R.menu.app_bar_btn, menu);
+//        View backBtn = findViewById(R.id.action_bar_back);
+//        backBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
         return true;
     }
 
