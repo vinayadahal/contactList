@@ -10,12 +10,4 @@
         android:visible="true"
         app:showAsAction="always" />
 
-    <!--<item-->
-    <!--android:id="@+id/download_file"-->
-    <!--android:layout_gravity="right"-->
-    <!--android:icon="@drawable/ic_cloud_download_black_24dp"-->
-    <!--android:title=""-->
-    <!--android:visible="true"-->
-    <!--app:showAsAction="always" />-->
-
 </menu>

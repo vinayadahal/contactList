@@ -1,7 +1,6 @@
 package contacts.com.contacts;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -41,8 +40,6 @@ import java.util.ArrayList;
 
 public class FileJsonWriter extends AppCompatActivity {
 
-    private ActionMenuView amvMenuBackBtn;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,30 +47,38 @@ public class FileJsonWriter extends AppCompatActivity {
         Toolbar Actionbar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(Actionbar);
         getSupportActionBar().setTitle(null);
-//        amvMenuBackBtn = (ActionMenuView) Actionbar.findViewById(R.id.amvMenu); //for setting arrow to left side
-
         //adding font icons to project
-        Typeface font = Typeface.createFromAsset(this.getAssets(), "fonts/fontawesome-webfont.ttf");
-        Button btn_go_back = (Button) findViewById(R.id.btn_go_back);
-        btn_go_back.setTypeface(font);
-        Button btn_download = (Button) findViewById(R.id.btn_download);
-        btn_download.setTypeface(font);
+//        Typeface font = Typeface.createFromAsset(this.getAssets(), "fonts/fontawesome-webfont.ttf");
+//        Button btn_go_back = (Button) findViewById(R.id.btn_go_back);
+//        btn_go_back.setTypeface(font);
+//        Button btn_download = (Button) findViewById(R.id.btn_download);
+//        btn_download.setTypeface(font);
         readFile();
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         System.out.println("called>>>>>>>>>>>>>menu");
-        // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.app_bar_btn, menu);
-//        View backBtn = findViewById(R.id.action_bar_back);
-//        backBtn.setOnClickListener(new View.OnClickListener() {
+        View backBtn = findViewById(R.id.back_btn);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+//        View actn_bar_download = findViewById(R.id.action_bar_download);
+//        System.out.println("????????????????????"+actn_bar_download);
+//        actn_bar_download.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                finish();
+//                System.out.println("damn>>>>>>>>>>>>>");
+////                DownloadFile(v);
 //            }
 //        });
+
         return true;
     }
 
