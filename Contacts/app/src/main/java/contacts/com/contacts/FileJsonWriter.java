@@ -1,24 +1,24 @@
 package contacts.com.contacts;
 
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ActionMenuView;
-import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -41,27 +41,15 @@ import java.util.ArrayList;
 
 public class FileJsonWriter extends AppCompatActivity {
 
+    private Toolbar Actionbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.click_layout);
-        Toolbar Actionbar = (Toolbar) findViewById(R.id.action_bar);
+        Actionbar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(Actionbar);
         getSupportActionBar().setTitle(null);
-        //adding font icons to project
-//        Typeface font = Typeface.createFromAsset(this.getAssets(), "fonts/fontawesome-webfont.ttf");
-//        Button btn_go_back = (Button) findViewById(R.id.btn_go_back);
-//        btn_go_back.setTypeface(font);
-//        Button btn_download = (Button) findViewById(R.id.btn_download);
-//        btn_download.setTypeface(font);
-        readFile();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        System.out.println("called>>>>>>>>>>>>>menu");
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.app_bar_btn, menu);
         View backBtn = findViewById(R.id.back_btn);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,19 +57,28 @@ public class FileJsonWriter extends AppCompatActivity {
                 finish();
             }
         });
+        readFile();
+    }
 
-//        View actn_bar_download = findViewById(R.id.action_bar_download);
-//        System.out.println("????????????????????"+actn_bar_download);
-//        actn_bar_download.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                System.out.println("damn>>>>>>>>>>>>>");
-////                DownloadFile(v);
-//            }
-//        });
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        System.out.println("called>>>>>>>>>>>>>menu");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.app_bar_btn, menu);
         return true;
     }
+
+    public void ShowSearchBox(MenuItem item) {
+        AppCompatTextView appCompatTextView = (AppCompatTextView) findViewById(R.id.txtView);
+        Actionbar.removeView(appCompatTextView);
+        AppCompatEditText appCompatEditText = new AppCompatEditText(this);
+        appCompatEditText.setHint("Search ...");
+        appCompatEditText.setHeight(Actionbar.getHeight());
+        appCompatEditText.setHintTextColor(0xFFFFFFFF);
+        appCompatEditText.setWidth(400);
+        Actionbar.addView(appCompatEditText);
+    }
+
 
     public void DownloadFile(View view) {
         URL url = null;
