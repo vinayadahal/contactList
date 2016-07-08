@@ -1,10 +1,12 @@
 package contacts.com.contacts;
 
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +44,10 @@ import java.util.ArrayList;
 public class FileJsonWriter extends AppCompatActivity {
 
     private Toolbar Actionbar;
+    private AppCompatTextView appCompatTextView;
+    private AppCompatEditText appCompatEditText;
+    private MenuItem searchIcon;
+    private MenuItem closeIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,23 +68,53 @@ public class FileJsonWriter extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        System.out.println("called>>>>>>>>>>>>>menu");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.app_bar_btn, menu);
+        closeIcon = menu.findItem(R.id.action_bar_close);
+        closeIcon.setVisible(false);
         return true;
     }
 
-    public void ShowSearchBox(MenuItem item) {
-        AppCompatTextView appCompatTextView = (AppCompatTextView) findViewById(R.id.txtView);
-        Actionbar.removeView(appCompatTextView);
-        AppCompatEditText appCompatEditText = new AppCompatEditText(this);
-        appCompatEditText.setHint("Search ...");
-        appCompatEditText.setHeight(Actionbar.getHeight());
-        appCompatEditText.setHintTextColor(0xFFFFFFFF);
-        appCompatEditText.setWidth(400);
-        Actionbar.addView(appCompatEditText);
-    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_bar_search:
+                appCompatTextView = (AppCompatTextView) findViewById(R.id.txtView);
+                Actionbar.removeView(appCompatTextView);
+                appCompatEditText = new AppCompatEditText(this);
+                appCompatEditText.setHint("Search ...");
+                appCompatEditText.setHeight(Actionbar.getHeight());
+                appCompatEditText.setHintTextColor(0xFFFFFFFF);
 
+                //for setting color of underline in edittext
+                Drawable drawable = appCompatEditText.getBackground();
+                drawable.setColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_ATOP);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    appCompatEditText.setBackground(drawable);
+                } else {
+                    appCompatEditText.setCompoundDrawables(null, null, drawable, null);
+                }
+                //end of color set code
+
+                appCompatEditText.setWidth(Actionbar.getWidth()); // sets search box width 100% all the time.
+                Actionbar.addView(appCompatEditText);
+                searchIcon = item;
+                searchIcon.setVisible(false);
+                closeIcon.setVisible(true);
+                return true;
+            case R.id.action_bar_close:
+                Actionbar.removeView(appCompatEditText);
+                Actionbar.addView(appCompatTextView);
+                searchIcon.setVisible(true);
+                closeIcon.setVisible(false);
+                return true;
+            case R.id.action_bar_download:
+                DownloadFile(null);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public void DownloadFile(View view) {
         URL url = null;
@@ -202,9 +238,5 @@ public class FileJsonWriter extends AppCompatActivity {
         } catch (SecurityException ex) {
             System.out.println(ex);
         }
-    }
-
-    public void GoBack(View view) {
-        finish();
     }
 }

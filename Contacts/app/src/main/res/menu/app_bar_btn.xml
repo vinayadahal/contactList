@@ -5,7 +5,6 @@
         android:id="@+id/action_bar_search"
         android:layout_gravity="left"
         android:icon="@drawable/ic_search_black_24dp"
-        android:onClick="ShowSearchBox"
         android:title=""
         android:visible="true"
         app:showAsAction="always" />
@@ -14,7 +13,6 @@
         android:id="@+id/action_bar_close"
         android:layout_gravity="left"
         android:icon="@drawable/ic_clear_black_24dp"
-        android:onClick="ShowSearchBox"
         android:title=""
         android:visible="true"
         app:showAsAction="always" />
