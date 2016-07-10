@@ -1,4 +1,4 @@
-package contacts.com.contacts;
+package contacts.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,14 +15,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         AppCompatImageButton appCompatImageButton = (AppCompatImageButton) findViewById(R.id.back_btn);
-//        AppCompatEditText appCompatEditText = (AppCompatEditText) findViewById(R.id.search_box);
         Toolbar toolbar = (Toolbar) findViewById(R.id.action_bar);
         toolbar.removeView(appCompatImageButton);
-//        toolbar.removeView(appCompatEditText);
     }
 
     public void page2(View view) {
-        Intent intent = new Intent(MainActivity.this, FileJsonWriter.class);
+        Intent intent = new Intent(MainActivity.this, ContactList.class);
         startActivity(intent);
     }
 }
