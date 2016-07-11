@@ -1,69 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:weightSum="1">
 
-
     <include layout="@layout/action_bar" />
-
-
-    <!--<android.support.v7.widget.Toolbar-->
-    <!--android:id="@+id/my_toolbar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="?attr/actionBarSize"-->
-    <!--android:background="@color/colorPrimary"-->
-    <!--android:elevation="4dp"-->
-    <!--app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"-->
-    <!--app:titleTextColor="#fff">-->
-
-    <!--<Button-->
-    <!--android:id="@+id/btn_go_back2"-->
-    <!--style="?android:attr/buttonStyleSmall"-->
-    <!--android:layout_width="27dp"-->
-    <!--android:layout_height="27dp"-->
-    <!--android:background="@drawable/ic_arrow_back_black_24dp"-->
-    <!--android:onClick="GoBack" />-->
-
-    <!--</android.support.v7.widget.Toolbar>-->
-
-
-    <!--<Button-->
-    <!--android:id="@+id/btn_go_back"-->
-    <!--style="?android:attr/buttonStyleSmall"-->
-    <!--android:layout_width="27dp"-->
-    <!--android:layout_height="27dp"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_marginLeft="8dp"-->
-    <!--android:layout_marginTop="?attr/actionBarSize"-->
-    <!--android:background="@drawable/ic_arrow_back_black_24dp"-->
-    <!--android:onClick="GoBack" />-->
-
-    <!--<Button-->
-    <!--android:id="@+id/btn_download"-->
-    <!--style="?android:attr/buttonStyleSmall"-->
-    <!--android:layout_width="37dp"-->
-    <!--android:layout_height="35dp"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_marginRight="5dp"-->
-    <!--android:layout_marginTop="?attr/actionBarSize"-->
-    <!--android:background="@drawable/ic_cloud_download_black_24dp"-->
-    <!--android:onClick="DownloadFile" />-->
-
-
-    <!--<TextView-->
-    <!--android:id="@+id/txtHeader"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_marginLeft="40dp"-->
-    <!--android:layout_marginTop="?attr/actionBarSize"-->
-    <!--android:padding="6dp"-->
-    <!--android:text="Contact List"-->
-    <!--android:textColor="#fff"-->
-    <!--android:textSize="18dp" />-->
 
     <LinearLayout
         android:id="@+id/lnrLayout"
@@ -73,14 +15,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="?attr/actionBarSize"
         android:background="#fff"
-        android:orientation="vertical">
-
-        <!--<TextView-->
-        <!--android:id="@+id/textViewPage2"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/btn_go_back" />-->
-    </LinearLayout>
+        android:orientation="vertical" />
 
 </RelativeLayout>
 

@@ -3,15 +3,10 @@ package contacts.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
-import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -20,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -34,18 +28,18 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import contacts.services.EditTextService;
+import contacts.services.AutoCompleteService;
 import contacts.services.FileService;
 
 public class ContactList extends AppCompatActivity {
 
     private Toolbar Actionbar;
     private AppCompatTextView appCompatTextView;
-    private AppCompatEditText appCompatEditText;
     private MenuItem searchIcon;
     private MenuItem closeIcon;
     private FileService fileService = new FileService();
-    private EditTextService editTextService = new EditTextService();
+    private AutoCompleteService autoCompleteService = new AutoCompleteService();
+    private AppCompatAutoCompleteTextView autoComplete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,25 +77,16 @@ public class ContactList extends AppCompatActivity {
             case R.id.action_bar_search:
                 appCompatTextView = (AppCompatTextView) findViewById(R.id.txtView);
                 Actionbar.removeView(appCompatTextView);
-                appCompatEditText = new AppCompatEditText(this);
-                appCompatEditText = editTextService.EditTextStyler(appCompatEditText, Actionbar); // calls styler from editTextService
-                editTextService.TextChange(appCompatEditText, this); // calls textChange action from another class
-                AppCompatAutoCompleteTextView autoComplete = (AppCompatAutoCompleteTextView) findViewById(R.id.autoComplete);
-                System.out.println(editTextService.userNames);
-                if (!editTextService.userNames.isEmpty()) {
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice, editTextService.userNames);
-                    autoComplete.setThreshold(1);
-                    autoComplete.setAdapter(adapter);
-                    LinearLayout lnrlayout = (LinearLayout) findViewById(R.id.lnrLayout);
-                    lnrlayout.addView(autoComplete);
-                }
-                Actionbar.addView(appCompatEditText);
+                autoComplete = new AppCompatAutoCompleteTextView(this);
+                autoComplete = autoCompleteService.EditTextStyler(autoComplete, Actionbar); // calls styler from autoCompleteService
+                autoCompleteService.TextChange(this, autoComplete); // calls textChange action from another class
+                Actionbar.addView(autoComplete);
                 searchIcon = item;
                 searchIcon.setVisible(false);
                 closeIcon.setVisible(true);
                 return true;
             case R.id.action_bar_close:
-                Actionbar.removeView(appCompatEditText);
+                Actionbar.removeView(autoComplete);
                 Actionbar.addView(appCompatTextView);
                 searchIcon.setVisible(true);
                 closeIcon.setVisible(false);
@@ -130,7 +115,7 @@ public class ContactList extends AppCompatActivity {
                 names.add(objJson.getString("name"));
                 phone.add(objJson.getString("phone"));
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, names);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_list, android.R.id.text1, names);
             final ListView listView = new ListView(this);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

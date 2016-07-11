@@ -79,6 +79,7 @@ public class FileService {
             outputStream = ctx.openFileOutput(filename, ctx.MODE_PRIVATE);
             outputStream.write(data.toString().getBytes());
             outputStream.close();
+            createToast("Contact list downloaded successfully");
         } catch (Exception e) {
             System.out.println("WriteToFile>>>>>" + e);
             createToast("Unable to save data on device");
@@ -104,12 +105,6 @@ public class FileService {
             return null;
         }
     }
-
-//    public StringBuilder searchFile(ctx) {
-//        StringBuilder sb = readFile(context);
-//        System.out.println("contactList->>>>>>>>>>>>>>>>> " + sb);
-//        return sb;
-//    }
 
     public void createToast(String msg, Context ctx) {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
