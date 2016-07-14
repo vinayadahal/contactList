@@ -2,6 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_go_btn"
+        android:layout_gravity="left"
+        android:icon="@drawable/ic_check_black_24dp"
+        android:title=""
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_bar_search"
         android:layout_gravity="left"
         android:icon="@drawable/ic_search_black_24dp"

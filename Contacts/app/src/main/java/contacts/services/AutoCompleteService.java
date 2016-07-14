@@ -24,6 +24,7 @@ import contacts.activities.R;
 public class AutoCompleteService {
 
     private FileService fileService = new FileService();
+    public AppCompatAutoCompleteTextView autoComplete_public;
 
     public AppCompatAutoCompleteTextView EditTextStyler(AppCompatAutoCompleteTextView autoComplete, Toolbar Actionbar) {
         autoComplete.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI); // prevents full screen edit text in landscape.
@@ -48,39 +49,80 @@ public class AutoCompleteService {
 
     public void TextChange(final Context ctx, final AppCompatAutoCompleteTextView autoComplete) {
         //final keyword makes sure a variable is set only once
-        autoComplete.addTextChangedListener(new TextWatcher() {
+        showAutoCompleteDropDown(ctx, autoComplete);
+//        autoComplete.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                showAutoCompleteDropDown(ctx, autoComplete);
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//            }
+//        });
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//        autoComplete.addTextChangedListener(new TextWatcher() {
+//
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                StringBuilder text = fileService.readFile(ctx);
+//                try {
+//                    JSONArray jArray = new JSONArray(text.toString().toLowerCase());
+//                    final ArrayList userNames = new ArrayList<>();
+//                    for (int i = 0; i < jArray.length(); i++) {
+//                        JSONObject objJson = jArray.getJSONObject(i);
+//                        if ((objJson.getString("name").contains(s))) {
+//                            userNames.add(WordUtils.capitalize(objJson.getString("name")));
+//                            break;
+//                        }
+//                    }
+//                    ArrayAdapter<String> adapter = new ArrayAdapter<>(ctx, R.layout.drop_down_item, userNames);
+//                    autoComplete.setThreshold(1);
+//                    autoComplete.setAdapter(adapter);
+//                    autoComplete.showDropDown();
+//                    autoComplete_public = autoComplete;
+//
+//                } catch (JSONException ex) {
+//                    System.out.println("This is json exception" + ex);
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
+    }
+
+    public void showAutoCompleteDropDown(final Context ctx, final AppCompatAutoCompleteTextView autoComplete) {
+        StringBuilder text = fileService.readFile(ctx);
+        if (text == null || text.equals("")) {
+            return;
+        }
+        try {
+            JSONArray jArray = new JSONArray(text.toString().toLowerCase());
+            final ArrayList userNames = new ArrayList<>();
+            for (int i = 0; i < jArray.length(); i++) {
+                JSONObject objJson = jArray.getJSONObject(i);
+                userNames.add(WordUtils.capitalize(objJson.getString("name")));
             }
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(ctx, R.layout.drop_down_item, userNames);
+            autoComplete.setThreshold(1);
+            autoComplete.setAdapter(adapter);
+            autoComplete.showDropDown();
+            autoComplete_public = autoComplete;
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                StringBuilder text = fileService.readFile(ctx);
-                try {
-                    JSONArray jArray = new JSONArray(text.toString().toLowerCase());
-                    final ArrayList userNames = new ArrayList<>();
-                    for (int i = 0; i < jArray.length(); i++) {
-                        JSONObject objJson = jArray.getJSONObject(i);
-                        if ((objJson.getString("name").contains(s))) {
-                            userNames.add(WordUtils.capitalize(objJson.getString("name")));
-                            break;
-                        }
-                    }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(ctx, R.layout.drop_down_item, userNames);
-                    autoComplete.setThreshold(1);
-                    autoComplete.setAdapter(adapter);
-                    autoComplete.showDropDown();
-                    System.out.println(autoComplete.getText());
-                } catch (JSONException ex) {
-                    System.out.println("This is json exception" + ex);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
+        } catch (JSONException ex) {
+            System.out.println("This is json exception" + ex);
+        }
     }
 }
