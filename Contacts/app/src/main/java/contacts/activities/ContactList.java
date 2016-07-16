@@ -3,6 +3,7 @@ package contacts.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,13 +11,17 @@ import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -42,6 +47,8 @@ public class ContactList extends AppCompatActivity {
     private FileService fileService = new FileService();
     private AutoCompleteService autoCompleteService = new AutoCompleteService();
     private AppCompatAutoCompleteTextView autoComplete;
+    private LinearLayout.LayoutParams llp;
+    private PopupWindow pw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +147,7 @@ public class ContactList extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     int itemPosition = position;
                     Toast.makeText(getApplicationContext(), "Calling: " + names.get(itemPosition), Toast.LENGTH_SHORT).show();
-                    callHotline(phone.get(itemPosition).toString());
+//                    callHotline(phone.get(itemPosition).toString());
                     showPopUp();
                 }
             });
@@ -177,7 +184,7 @@ public class ContactList extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     int itemPosition = position;
                     Toast.makeText(getApplicationContext(), "Calling: " + userNames.get(itemPosition), Toast.LENGTH_SHORT).show();
-                    callHotline(phone.get(itemPosition).toString());
+//                    callHotline(phone.get(itemPosition).toString());
                     showPopUp();
                 }
             });
@@ -191,10 +198,19 @@ public class ContactList extends AppCompatActivity {
 
 
     public void showPopUp() {
+        LinearLayout lnrlayout = (LinearLayout) findViewById(R.id.lnrLayout);
+        llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        PopupWindow pw = new PopupWindow(inflater.inflate(R.layout.choice_pop_up, null, false), 100, 100, true);
-        pw.showAtLocation(this.findViewById(R.id.lnrLayout), Gravity.CENTER, 0, 0);
+        pw = new PopupWindow(inflater.inflate(R.layout.choice_pop_up, null, false), llp.width, llp.height, true);
+        pw.showAtLocation(lnrlayout, Gravity.CENTER, 0, 0);
+
     }
+
+
+    public void hidePopUp(View view) {
+        pw.dismiss();
+    }
+
 
     public void callHotline(String phone) {
         Intent callIntent = new Intent(Intent.ACTION_CALL);
