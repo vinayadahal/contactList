@@ -3,7 +3,6 @@ package contacts.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,23 +10,20 @@ import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +50,7 @@ public class ContactList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.click_layout);
+
         Actionbar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(Actionbar);
         getSupportActionBar().setTitle(null);
@@ -64,6 +61,7 @@ public class ContactList extends AppCompatActivity {
                 finish();
             }
         });
+
         StringBuilder contactData = fileService.readFile(this);
         if (contactData == null) {
             return;
@@ -91,7 +89,6 @@ public class ContactList extends AppCompatActivity {
                 autoComplete = new AppCompatAutoCompleteTextView(this);
                 autoComplete = autoCompleteService.EditTextStyler(autoComplete, Actionbar); // calls styler from autoCompleteService
                 autoCompleteService.TextChange(this, autoComplete); // calls textChange action from another class
-//                System.out.println(autoComplete.getText());
                 Actionbar.addView(autoComplete);
                 searchIcon = item;
                 searchIcon.setVisible(false);
@@ -146,9 +143,7 @@ public class ContactList extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     int itemPosition = position;
-                    Toast.makeText(getApplicationContext(), "Calling: " + names.get(itemPosition), Toast.LENGTH_SHORT).show();
-//                    callHotline(phone.get(itemPosition).toString());
-                    showPopUp();
+                    showPopUp(names.get(itemPosition).toString(), phone.get(itemPosition).toString());
                 }
             });
             layout.removeAllViews();
@@ -183,9 +178,7 @@ public class ContactList extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     int itemPosition = position;
-                    Toast.makeText(getApplicationContext(), "Calling: " + userNames.get(itemPosition), Toast.LENGTH_SHORT).show();
-//                    callHotline(phone.get(itemPosition).toString());
-                    showPopUp();
+                    showPopUp(userNames.get(itemPosition).toString(), phone.get(itemPosition).toString());
                 }
             });
             layout.removeAllViews();
@@ -197,13 +190,36 @@ public class ContactList extends AppCompatActivity {
     }
 
 
-    public void showPopUp() {
+    public void showPopUp(String username, String phone) {
         LinearLayout lnrlayout = (LinearLayout) findViewById(R.id.lnrLayout);
         llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        pw = new PopupWindow(inflater.inflate(R.layout.choice_pop_up, null, false), llp.width, llp.height, true);
+        View choice_pop_up = inflater.inflate(R.layout.choice_pop_up, null, true);
+        addChoiceBtns(choice_pop_up, username, phone);
+        pw = new PopupWindow(choice_pop_up, llp.width, llp.height, true);
         pw.showAtLocation(lnrlayout, Gravity.CENTER, 0, 0);
+    }
 
+    public void addChoiceBtns(View v, final String username, final String phone) {
+        Button call_btn = (Button) v.findViewById(R.id.popup_call_btn);
+        call_btn.setText("Call: " + username);
+        call_btn.setTransformationMethod(null);
+        call_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Calling: " + username, Toast.LENGTH_SHORT).show();
+                callHotline(phone);
+            }
+        });
+        Button sms_btn = (Button) v.findViewById(R.id.popup_sms_btn);
+        sms_btn.setText("SMS: " + username);
+        sms_btn.setTransformationMethod(null);
+        sms_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Show Messaging: " + username, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
