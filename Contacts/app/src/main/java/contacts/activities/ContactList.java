@@ -3,6 +3,8 @@ package contacts.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +12,12 @@ import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -197,6 +201,9 @@ public class ContactList extends AppCompatActivity {
         View choice_pop_up = inflater.inflate(R.layout.choice_pop_up, null, true);
         addChoiceBtns(choice_pop_up, username, phone);
         pw = new PopupWindow(choice_pop_up, llp.width, llp.height, true);
+        pw.setBackgroundDrawable (new ColorDrawable()); //helped me to hide popup
+        pw.setOutsideTouchable(true);
+        pw.setTouchable(true);
         pw.showAtLocation(lnrlayout, Gravity.CENTER, 0, 0);
     }
 
@@ -222,11 +229,9 @@ public class ContactList extends AppCompatActivity {
         });
     }
 
-
     public void hidePopUp(View view) {
         pw.dismiss();
     }
-
 
     public void callHotline(String phone) {
         Intent callIntent = new Intent(Intent.ACTION_CALL);

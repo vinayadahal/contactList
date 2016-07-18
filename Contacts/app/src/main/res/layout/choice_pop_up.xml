@@ -16,7 +16,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#333">
+            android:background="@color/colorPrimaryDark">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -31,7 +31,7 @@
                 android:layout_width="50dp"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_alignParentRight="true"
-                android:background="#333"
+                android:background="@color/colorPrimaryDark"
                 android:onClick="hidePopUp"
                 android:src="@drawable/ic_clear_black_24dp" />
         </RelativeLayout>
@@ -48,16 +48,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="#fff"
+                android:drawableLeft="@android:drawable/ic_menu_call"
                 android:gravity="left|center"
-                android:paddingLeft="15dp" />
+                android:paddingLeft="10dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
 
             <Button
                 android:id="@+id/popup_sms_btn"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="#fff"
+                android:drawableLeft="@android:drawable/ic_menu_send"
                 android:gravity="left|center"
-                android:paddingLeft="15dp" />
+                android:paddingLeft="10dp" />
 
         </LinearLayout>
 
