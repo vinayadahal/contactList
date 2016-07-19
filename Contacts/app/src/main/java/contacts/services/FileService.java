@@ -39,7 +39,7 @@ public class FileService {
     public URL DownloadFile() {
         URL url;
         try {
-            url = new URL("http://192.168.1.5/api");
+            url = new URL("http://192.168.1.6/api");
             return url;
         } catch (MalformedURLException ex) {
             System.out.println("Caught Exception URL: " + ex);

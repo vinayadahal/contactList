@@ -4,18 +4,18 @@
     android:id="@+id/action_bar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/colorPrimary"
+    android:background="@color/colorPrimaryDark"
     android:elevation="4dp"
     app:contentInsetLeft="0dp"
     app:contentInsetStart="0dp"
     app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
-    app:titleTextColor="#fff">
+    app:titleTextColor="@color/colorTextForDark">
 
     <android.support.v7.widget.AppCompatImageButton
         android:id="@+id/back_btn"
         android:layout_width="50dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/btn_close_selector"
         android:src="@drawable/ic_arrow_back_black_24dp" />
 
     <android.support.v7.widget.AppCompatTextView

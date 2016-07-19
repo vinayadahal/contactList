@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="?attr/actionBarSize"
-        android:background="#fff"
+        android:background="@color/colorBackground"
         android:orientation="vertical" />
 
 </RelativeLayout>
