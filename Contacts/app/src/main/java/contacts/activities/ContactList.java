@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -41,6 +43,7 @@ public class ContactList extends AppCompatActivity {
     private MenuItem searchIcon;
     private MenuItem closeIcon;
     private MenuItem forwardIcon;
+    private MenuItem downloadIcon;
     private FileService fileService = new FileService();
     private AutoCompleteService autoCompleteService = new AutoCompleteService();
     private AppCompatAutoCompleteTextView autoComplete;
@@ -109,11 +112,18 @@ public class ContactList extends AppCompatActivity {
                 createContactList(contactData);
                 return true;
             case R.id.action_bar_download:
+                ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLargeInverse);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    item.setActionView(progressBar);
+                }
                 StringBuilder contactList = fileService.getContactList(this);
                 if (contactList == null) {
                     return false;
                 }
                 createContactList(contactList);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    item.setActionView(null);
+                }
                 return true;
 
             case R.id.action_go_btn:
@@ -198,7 +208,7 @@ public class ContactList extends AppCompatActivity {
         View choice_pop_up = inflater.inflate(R.layout.choice_pop_up, null, true);
         addChoiceBtns(choice_pop_up, username, phone);
         pw = new PopupWindow(choice_pop_up, llp.width, llp.height, true);
-        pw.setBackgroundDrawable (new ColorDrawable()); //helped me to hide popup
+        pw.setBackgroundDrawable(new ColorDrawable()); //helped me to hide popup
         pw.setOutsideTouchable(true);
         pw.setTouchable(true);
         pw.showAtLocation(lnrlayout, Gravity.CENTER, 0, 0);
