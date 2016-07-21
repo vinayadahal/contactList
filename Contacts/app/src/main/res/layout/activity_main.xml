@@ -8,22 +8,53 @@
 
     <include layout="@layout/action_bar" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize"
-        android:text="This text is coming from View only." />
+        android:orientation="vertical"
+        android:padding="15dp">
 
-    <Button
-        android:id="@+id/btn_click_me"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView"
-        android:onClick="page2"
-        android:text="GOTO Page 2" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:text="Welcome, please provide your credential to get started!"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/editTextUsername"
+            android:layout_width="fill_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginBottom="20dp"
+            android:hint="Username"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="fill_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginBottom="20dp"
+            android:hint="Password"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="textPersonName" />
+
+
+        <Button
+            android:id="@+id/btn_click_me"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:onClick="login"
+            android:text="Login"
+            android:textColor="@color/colorTextForDark" />
+    </LinearLayout>
 </RelativeLayout>

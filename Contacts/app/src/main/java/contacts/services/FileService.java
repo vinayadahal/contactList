@@ -14,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import contacts.config.AppConfig;
+
 public class FileService {
 
     Context context;
@@ -38,8 +40,9 @@ public class FileService {
 
     public URL DownloadFile() {
         URL url;
+        AppConfig objAppConfig = new AppConfig();
         try {
-            url = new URL("http://192.168.1.4/api");
+            url = new URL(objAppConfig.remoteServer);
             return url;
         } catch (MalformedURLException ex) {
             System.out.println("Caught Exception URL: " + ex);
