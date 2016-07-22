@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             createToast("Username or password cannot be empty");
             return;
         }
-        objLoginService.Login(username, password);
+        objLoginService.execute(username, password);
         showContactList();
     }
 
