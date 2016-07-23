@@ -32,9 +32,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import contacts.config.AppConfig;
 import contacts.services.AutoCompleteService;
 import contacts.services.FileService;
+import contacts.services.UrlConnectionService;
 
 public class ContactList extends AppCompatActivity {
 
@@ -43,12 +47,12 @@ public class ContactList extends AppCompatActivity {
     private MenuItem searchIcon;
     private MenuItem closeIcon;
     private MenuItem forwardIcon;
-    private MenuItem downloadIcon;
     private FileService fileService = new FileService();
     private AutoCompleteService autoCompleteService = new AutoCompleteService();
     private AppCompatAutoCompleteTextView autoComplete;
     private LinearLayout.LayoutParams llp;
     private PopupWindow pw;
+    AppConfig objAppConfig = new AppConfig();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +121,13 @@ public class ContactList extends AppCompatActivity {
                     item.setActionView(progressBar);
                 }
                 StringBuilder contactList = fileService.getContactList(this);
+                Map connectionDetails = new HashMap<>();
+                connectionDetails.put("url", objAppConfig.remoteServer);
+                connectionDetails.put("method", "GET");
+                connectionDetails.put("context", this);
+                connectionDetails.put("filename", "Contacts");
+                UrlConnectionService objUrlService = new UrlConnectionService();
+                objUrlService.execute(connectionDetails);
                 if (contactList == null) {
                     return false;
                 }

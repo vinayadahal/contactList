@@ -18,7 +18,7 @@ $dataRow = $ds->query("select username,password from users WHERE username='".$_P
 if(empty($dataRow)){
 	echo "username password problem";
 }
-    $data;
+    $data[0]="Authentication failed";
     $i = 0;
 foreach ($dataRow as $rows) {
     $data[$i++] = array("username" => $rows['username'], "password" => $rows['password']);

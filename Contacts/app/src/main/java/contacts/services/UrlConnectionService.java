@@ -20,71 +20,13 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import contacts.config.AppConfig;
-
-public class LoginService extends AsyncTask<String, String, String> {
-
+public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
     HttpURLConnection urlConnection;
-    StringBuilder sbResponse = new StringBuilder();
-    public Context ctx;
 
-//    @Override
-//    protected void onPreExecute() {
-//        super.onPreExecute();
-//    }
-
-    @Override
-    protected String doInBackground(String... params) {
-        ConnectToServer();
-        HashMap<String, String> postData = new HashMap<>();
-        postData.put("username", params[0]);
-        postData.put("password", params[1]);
-        String response = "";
-
-        try {
-            String postDetails = encodeUrl(postData);
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setDoInput(true);
-            urlConnection.setDoOutput(true);
-
-            OutputStream os = urlConnection.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(postDetails.toString());
-
-            writer.flush();
-            writer.close();
-            os.close();
-
-            int responseCode = urlConnection.getResponseCode();
-
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
-                String line;
-                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                while ((line = br.readLine()) != null) {
-                    response += line;
-                }
-
-                sbResponse.append(response);
-            } else {
-                response = "No Response From Server";
-
-            }
-            System.out.println("respone-------------->>>>>>>>>>>>>> " + response);
-        } catch (ProtocolException ex) {
-            System.out.println("caught protocol exception");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean ConnectToServer() {
+    public boolean ConnectToServer(String remoteUrl) {
         URL url;
-        AppConfig objAppConfig = new AppConfig();
         try {
-            url = new URL(objAppConfig.remoteServer + "/getdata.php");
+            url = new URL(remoteUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(200);
             return true;
@@ -94,10 +36,74 @@ public class LoginService extends AsyncTask<String, String, String> {
         }
     }
 
-    public String encodeUrl(HashMap<String, String> postData) {
 
+    @Override
+    protected Void doInBackground(Map... params) {
+        ConnectToServer(params[0].get("url").toString());
+        if (params[0].get("method") == "POST" || params[0].get("method") == "post") {
+            doPost("POST");
+            hitUrl((Map) params[0].get("args"));
+            recieveResponse();
+        } else if (params[0].get("method") == "GET" || params[0].get("method") == "get") {
+            FileHandleService objFileHandle = new FileHandleService();
+            objFileHandle.WriteToFile("This Text only. I guess.", (Context) params[0].get("context"), "info");
+        } else {
+            System.out.println("HTTP Method Error");
+        }
+        return null;
+    }
 
-        System.out.println("context=====" + this);
+    protected void doPost(String method) {
+        try {
+            urlConnection.setRequestMethod(method);
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void hitUrl(Map dataList) {
+        try {
+            OutputStream os = urlConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.write(encodeUrl(dataList));
+            writer.flush();
+            writer.close();
+            os.close();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void recieveResponse() {
+        try {
+            String response = "";
+            int responseCode = urlConnection.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                String line;
+                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                while ((line = br.readLine()) != null) {
+                    response += line;
+                }
+            } else {
+                response = "No Response From Server";
+
+            }
+            System.out.println("RESPONSE:::::: " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void doGet() {
+
+    }
+
+    public String encodeUrl(Map<String, String> postData) {
         StringBuilder result = new StringBuilder();
         boolean flag = true;
         for (Map.Entry<String, String> dataSet : postData.entrySet()) {
@@ -106,7 +112,6 @@ public class LoginService extends AsyncTask<String, String, String> {
             } else {
                 result.append("&");
             }
-
             try {
                 result.append(URLEncoder.encode(dataSet.getKey(), "UTF-8"));
                 result.append("=");
@@ -117,6 +122,4 @@ public class LoginService extends AsyncTask<String, String, String> {
         }
         return result.toString();
     }
-
-
 }

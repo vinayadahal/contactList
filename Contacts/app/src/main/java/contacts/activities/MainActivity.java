@@ -10,10 +10,17 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import contacts.config.AppConfig;
 import contacts.services.LoginService;
+import contacts.services.UrlConnectionService;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    AppConfig objAppConfig = new AppConfig();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void login(View view) {
         LoginService objLoginService = new LoginService();
+        UrlConnectionService objConnection = new UrlConnectionService();
         if (!objLoginService.ConnectToServer()) {
             createToast("Contact list downloaded successfully");
             return;
@@ -38,7 +46,20 @@ public class MainActivity extends AppCompatActivity {
             createToast("Username or password cannot be empty");
             return;
         }
-        objLoginService.execute(username, password);
+
+        Map args = new HashMap<>();
+        args.put("username", username);
+        args.put("password", password);
+
+        Map connectionDetails = new HashMap<>();
+
+        connectionDetails.put("url", objAppConfig.remoteServer + "/getdata.php");
+        connectionDetails.put("method", "POST");
+        connectionDetails.put("args", args);
+        objConnection.execute(connectionDetails);
+
+
+//        objLoginService.execute(username, password);
         showContactList();
     }
 
