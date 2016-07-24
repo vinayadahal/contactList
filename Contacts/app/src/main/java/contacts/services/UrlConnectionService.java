@@ -3,6 +3,8 @@ package contacts.services;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,12 +17,13 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
+
+    public boolean serverResponse;
     HttpURLConnection urlConnection;
 
     public boolean ConnectToServer(String remoteUrl) {
@@ -45,8 +48,7 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
             hitUrl((Map) params[0].get("args"));
             recieveResponse();
         } else if (params[0].get("method") == "GET" || params[0].get("method") == "get") {
-            FileHandleService objFileHandle = new FileHandleService();
-            objFileHandle.WriteToFile("This Text only. I guess.", (Context) params[0].get("context"), "info");
+            doGet("GET", (Context) params[0].get("context"));
         } else {
             System.out.println("HTTP Method Error");
         }
@@ -90,17 +92,33 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
                     response += line;
                 }
             } else {
-                response = "No Response From Server";
+                response = "No Response";
+            }
 
+            if (response.isEmpty() || response == "No Response") {
+                System.out.println("should be false >>>>>>----------");
+                serverResponse = false;
+            } else {
+                System.out.println("should be true....>>>>>>>>>>>");
+                serverResponse = true;
             }
             System.out.println("RESPONSE:::::: " + response);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    protected void doGet() {
-
+    protected void doGet(String method, final Context ctx) {
+        try {
+            urlConnection.setRequestMethod(method);
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+        FileHandleService objFileHandle = new FileHandleService();
+        String serverResponse = objFileHandle.ReadResponse(urlConnection, ctx);
+        objFileHandle.WriteToFile(serverResponse, ctx, "Contacts");
+//        StringBuilder fileContent = objFileHandle.readFile(ctx, "Contacts");
     }
 
     public String encodeUrl(Map<String, String> postData) {
@@ -121,5 +139,15 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
             }
         }
         return result.toString();
+    }
+
+    public void createToast(final String msg, final Context ctx) {
+        Handler handler = new Handler(ctx.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 }

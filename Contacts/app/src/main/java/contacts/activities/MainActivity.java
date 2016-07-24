@@ -52,15 +52,16 @@ public class MainActivity extends AppCompatActivity {
         args.put("password", password);
 
         Map connectionDetails = new HashMap<>();
-
         connectionDetails.put("url", objAppConfig.remoteServer + "/getdata.php");
         connectionDetails.put("method", "POST");
         connectionDetails.put("args", args);
         objConnection.execute(connectionDetails);
-
-
-//        objLoginService.execute(username, password);
-        showContactList();
+        System.out.println("THE RESPONSE" + objConnection.serverResponse);
+//        if (!objConnection.serverResponse) {
+//            createToast("Authentication Failed. Please re-login.");
+//        } else {
+            showContactList();
+//        }
     }
 
     public void showContactList() {

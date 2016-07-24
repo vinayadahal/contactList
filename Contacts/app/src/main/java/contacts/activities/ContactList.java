@@ -37,6 +37,7 @@ import java.util.Map;
 
 import contacts.config.AppConfig;
 import contacts.services.AutoCompleteService;
+import contacts.services.FileHandleService;
 import contacts.services.FileService;
 import contacts.services.UrlConnectionService;
 
@@ -116,11 +117,11 @@ public class ContactList extends AppCompatActivity {
                 createContactList(contactData);
                 return true;
             case R.id.action_bar_download:
-                ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLargeInverse);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    item.setActionView(progressBar);
-                }
-                StringBuilder contactList = fileService.getContactList(this);
+//                ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLargeInverse);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//                    item.setActionView(progressBar);
+//                }
+//                StringBuilder contactList = fileService.getContactList(this);
                 Map connectionDetails = new HashMap<>();
                 connectionDetails.put("url", objAppConfig.remoteServer);
                 connectionDetails.put("method", "GET");
@@ -128,13 +129,15 @@ public class ContactList extends AppCompatActivity {
                 connectionDetails.put("filename", "Contacts");
                 UrlConnectionService objUrlService = new UrlConnectionService();
                 objUrlService.execute(connectionDetails);
+                FileHandleService objFileHandle = new FileHandleService();
+                StringBuilder contactList = objFileHandle.readFile(this, "Contacts");
                 if (contactList == null) {
                     return false;
                 }
                 createContactList(contactList);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    item.setActionView(null);
-                }
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//                    item.setActionView(null);
+//                }
                 return true;
 
             case R.id.action_go_btn:

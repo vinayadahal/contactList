@@ -18,10 +18,15 @@ $dataRow = $ds->query("select username,password from users WHERE username='".$_P
 if(empty($dataRow)){
 	echo "username password problem";
 }
-    $data[0]="Authentication failed";
+    $data;
     $i = 0;
 foreach ($dataRow as $rows) {
     $data[$i++] = array("username" => $rows['username'], "password" => $rows['password']);
 }
+if(!empty($data)){
 header('Content-Type: application/json;charset=utf-8');
 echo json_encode($data);
+}
+//else{
+	//echo "Authentication FAILED"
+//}
