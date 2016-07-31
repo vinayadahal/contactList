@@ -12,8 +12,10 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import contacts.config.AppConfig;
+import contacts.services.FileHandleService;
 import contacts.services.LoginService;
 import contacts.services.UrlConnectionService;
 
@@ -55,12 +57,20 @@ public class MainActivity extends AppCompatActivity {
         connectionDetails.put("url", objAppConfig.remoteServer + "/getdata.php");
         connectionDetails.put("method", "POST");
         connectionDetails.put("args", args);
-        objConnection.execute(connectionDetails);
+        try {
+            objConnection.execute(connectionDetails).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         System.out.println("THE RESPONSE" + objConnection.serverResponse);
+        FileHandleService objFileHandle = new FileHandleService();
+        StringBuilder loginData = objFileHandle.readFile(this, "info");
 //        if (!objConnection.serverResponse) {
 //            createToast("Authentication Failed. Please re-login.");
 //        } else {
-            showContactList();
+        showContactList();
 //        }
     }
 

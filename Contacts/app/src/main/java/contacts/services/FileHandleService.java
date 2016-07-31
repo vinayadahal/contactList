@@ -16,7 +16,6 @@ import java.net.HttpURLConnection;
 
 public class FileHandleService {
 
-
     public String ReadResponse(HttpURLConnection urlConnection, Context ctx) {
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -32,7 +31,7 @@ public class FileHandleService {
             return textData.toString();
         } catch (IOException | NullPointerException ex) {
             System.out.println("Caught Exception IO: " + ex);
-            createToast("Unable to read data from server", ctx);
+            createToast("Failed to connect server", ctx);
             return null;
         }
     }
@@ -54,7 +53,7 @@ public class FileHandleService {
         }
     }
 
-    public StringBuilder readFile(Context ctx, String filename) {
+    public StringBuilder readFile(Context ctx, String filename) { // checks and creates file if not exists
         System.out.println("Reading From File ------->>>>>>>>>>");
         StringBuilder text = new StringBuilder();
         File file = new File(ctx.getApplicationContext().getFilesDir() + "/" + filename);

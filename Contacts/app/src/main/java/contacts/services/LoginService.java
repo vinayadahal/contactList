@@ -1,7 +1,6 @@
 package contacts.services;
 
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import java.io.BufferedReader;
@@ -26,12 +25,6 @@ public class LoginService extends AsyncTask<String, String, String> {
 
     HttpURLConnection urlConnection;
     StringBuilder sbResponse = new StringBuilder();
-    public Context ctx;
-
-//    @Override
-//    protected void onPreExecute() {
-//        super.onPreExecute();
-//    }
 
     @Override
     protected String doInBackground(String... params) {

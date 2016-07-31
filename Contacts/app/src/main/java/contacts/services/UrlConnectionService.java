@@ -4,6 +4,7 @@ package contacts.services;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Message;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
+public class UrlConnectionService extends AsyncTask<Map, Void, String> {
 
     public boolean serverResponse;
     HttpURLConnection urlConnection;
@@ -41,14 +42,17 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
 
 
     @Override
-    protected Void doInBackground(Map... params) {
+    protected String doInBackground(Map... params) {
+        System.out.println("should be first//////////////////////////////");
         ConnectToServer(params[0].get("url").toString());
         if (params[0].get("method") == "POST" || params[0].get("method") == "post") {
             doPost("POST");
             hitUrl((Map) params[0].get("args"));
             recieveResponse();
+            return "post OK";
         } else if (params[0].get("method") == "GET" || params[0].get("method") == "get") {
             doGet("GET", (Context) params[0].get("context"));
+            return "get OK";
         } else {
             System.out.println("HTTP Method Error");
         }
@@ -96,10 +100,8 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
             }
 
             if (response.isEmpty() || response == "No Response") {
-                System.out.println("should be false >>>>>>----------");
                 serverResponse = false;
             } else {
-                System.out.println("should be true....>>>>>>>>>>>");
                 serverResponse = true;
             }
             System.out.println("RESPONSE:::::: " + response);
@@ -117,8 +119,11 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
         }
         FileHandleService objFileHandle = new FileHandleService();
         String serverResponse = objFileHandle.ReadResponse(urlConnection, ctx);
+        if (serverResponse == null) {
+            createToast("No response from server", ctx);
+            return;
+        }
         objFileHandle.WriteToFile(serverResponse, ctx, "Contacts");
-//        StringBuilder fileContent = objFileHandle.readFile(ctx, "Contacts");
     }
 
     public String encodeUrl(Map<String, String> postData) {
@@ -151,3 +156,5 @@ public class UrlConnectionService extends AsyncTask<Map, Void, Void> {
 
     }
 }
+
+
