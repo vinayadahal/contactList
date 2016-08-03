@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -17,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 import contacts.config.AppConfig;
 import contacts.services.FileHandleService;
 import contacts.services.LoginService;
-import contacts.services.UrlConnectionService;
+import contacts.services.NetworkService;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void login(View view) {
         LoginService objLoginService = new LoginService();
-        UrlConnectionService objConnection = new UrlConnectionService();
+
         if (!objLoginService.ConnectToServer()) {
             createToast("Contact list downloaded successfully");
             return;
@@ -57,14 +58,18 @@ public class MainActivity extends AppCompatActivity {
         connectionDetails.put("url", objAppConfig.remoteServer + "/getdata.php");
         connectionDetails.put("method", "POST");
         connectionDetails.put("args", args);
+        NetworkService objNetworkService = new NetworkService();
         try {
-            objConnection.execute(connectionDetails).get();
+            HttpURLConnection objHttpUrlConnection = objNetworkService.execute(connectionDetails).get();
+            if (objHttpUrlConnection == null) {
+                System.out.println("response is null");
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println("THE RESPONSE" + objConnection.serverResponse);
+//        System.out.println("THE RESPONSE" + objNetworkInterface.serverResponse);
         FileHandleService objFileHandle = new FileHandleService();
         StringBuilder loginData = objFileHandle.readFile(this, "info");
 //        if (!objConnection.serverResponse) {

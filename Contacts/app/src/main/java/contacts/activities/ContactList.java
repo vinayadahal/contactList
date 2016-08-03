@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatTextView;
@@ -27,19 +28,17 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import contacts.config.AppConfig;
 import contacts.services.AutoCompleteService;
 import contacts.services.FileHandleService;
-import contacts.services.UrlConnectionService;
+import contacts.services.JsonToList;
+import contacts.services.NetworkService;
 
 public class ContactList extends AppCompatActivity {
 
@@ -60,7 +59,6 @@ public class ContactList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_list_layout);
-
         Actionbar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(Actionbar);
         getSupportActionBar().setTitle(null);
@@ -71,7 +69,6 @@ public class ContactList extends AppCompatActivity {
                 finish();
             }
         });
-
         StringBuilder contactData = objFileHandle.readFile(this, filename);
         if (contactData == null) {
             return;
@@ -118,7 +115,7 @@ public class ContactList extends AppCompatActivity {
                 createContactList(contactData);
                 return true;
             case R.id.action_bar_download:
-                ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLargeInverse);
+                ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                     item.setActionView(progressBar);
                 }
@@ -127,18 +124,27 @@ public class ContactList extends AppCompatActivity {
                 connectionDetails.put("method", "GET");
                 connectionDetails.put("context", this);
                 connectionDetails.put("filename", filename);
-                UrlConnectionService objUrlService = new UrlConnectionService();
+                NetworkService objNetworkService = new NetworkService();
                 try {
-                    objUrlService.execute(connectionDetails).get(); //waits for execute to complete.
+                    HttpURLConnection objHttpConnection = objNetworkService.execute(connectionDetails).get(); //waits for execute to complete.
+                    String serverResponse = objFileHandle.ReadResponse(objHttpConnection, this);
+                    if (serverResponse == null) {
+                        return true;
+                    }
+                    if (objFileHandle.WriteToFile(serverResponse, this, "Contacts")) {
+                        createToast("Contact list downloaded successfully", this);
+                    } else {
+                        createToast("Unable to save data on device", this);
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
-                System.out.println("reading file:::::::::::::::");
 
                 StringBuilder contactList = objFileHandle.readFile(this, filename);
                 if (contactList == null) {
+                    createToast("Contact list missing. Please re-download", this);
                     return false;
                 }
                 createContactList(contactList);
@@ -146,7 +152,6 @@ public class ContactList extends AppCompatActivity {
                     item.setActionView(null);
                 }
                 return true;
-
             case R.id.action_go_btn:
                 searchContact(autoComplete.getText().toString());
                 return true;
@@ -154,71 +159,36 @@ public class ContactList extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     public void createContactList(StringBuilder text) {
-        try {
-            JSONArray jArray = new JSONArray(text.toString());
-            LinearLayout layout = (LinearLayout) findViewById(R.id.lnrLayout);
-            ArrayList user_id = new ArrayList<>();
-            final ArrayList names = new ArrayList<>();
-            final ArrayList phone = new ArrayList<>();
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject objJson = jArray.getJSONObject(i);
-                user_id.add(objJson.getString("id"));
-                names.add(objJson.getString("name"));
-                phone.add(objJson.getString("phone"));
-            }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_list, android.R.id.text1, names);
-            final ListView listView = new ListView(this);
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    int itemPosition = position;
-                    showPopUp(names.get(itemPosition).toString(), phone.get(itemPosition).toString());
-                }
-            });
-            layout.removeAllViews();
-            layout.addView(listView);
-        } catch (JSONException ex) {
-            System.out.println(ex);
-        }
+        JsonToList objJsonToList = new JsonToList();
+        objJsonToList.setList(text);
+        showContactList(objJsonToList.getListNames(), objJsonToList.getListPhone());
     }
 
-    public void searchContact(String name) {
+    public void searchContact(String searchKeyword) {
         StringBuilder text = objFileHandle.readFile(this, filename);
         if (text == null || text.equals("")) {
             return;
         }
-        try {
-            JSONArray jArray = new JSONArray(text.toString());
-            final ArrayList userNames = new ArrayList<>();
-            final ArrayList phone = new ArrayList<>();
-            for (int i = 0; i < jArray.length(); i++) {
-                JSONObject objJson = jArray.getJSONObject(i);
-                if ((objJson.getString("name").contains(name))) {
-                    userNames.add(objJson.getString("name"));
-                    phone.add(objJson.getString("phone"));
-                    break;
-                }
-            }
-            LinearLayout layout = (LinearLayout) findViewById(R.id.lnrLayout);
-            final ListView listView = new ListView(this);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_list, userNames);
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    int itemPosition = position;
-                    showPopUp(userNames.get(itemPosition).toString(), phone.get(itemPosition).toString());
-                }
-            });
-            layout.removeAllViews();
-            layout.addView(listView);
+        JsonToList objJsonToList = new JsonToList();
+        objJsonToList.setList(text, searchKeyword);
+        showContactList(objJsonToList.getListNames(), objJsonToList.getListPhone());
+    }
 
-        } catch (JSONException ex) {
-            System.out.println("This is json exception" + ex);
-        }
+    public void showContactList(final List names, final List phone) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_list, android.R.id.text1, names);
+        final ListView listView = new ListView(this);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int itemPosition = position;
+                showPopUp(names.get(itemPosition).toString(), phone.get(itemPosition).toString());
+            }
+        });
+        LinearLayout layout = (LinearLayout) findViewById(R.id.lnrLayout);
+        layout.removeAllViews();
+        layout.addView(listView);
     }
 
 
@@ -227,7 +197,7 @@ public class ContactList extends AppCompatActivity {
         llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View choice_pop_up = inflater.inflate(R.layout.choice_pop_up, null, true);
-        addChoiceBtns(choice_pop_up, username, phone);
+        choiceButtons(choice_pop_up, username, phone);
         pw = new PopupWindow(choice_pop_up, llp.width, llp.height, true);
         pw.setBackgroundDrawable(new ColorDrawable()); //helped me to hide popup
         pw.setOutsideTouchable(true);
@@ -235,7 +205,7 @@ public class ContactList extends AppCompatActivity {
         pw.showAtLocation(lnrlayout, Gravity.CENTER, 0, 0);
     }
 
-    public void addChoiceBtns(View v, final String username, final String phone) {
+    public void choiceButtons(View v, final String username, final String phone) {
         Button call_btn = (Button) v.findViewById(R.id.popup_call_btn);
         call_btn.setText("Call: " + username);
         call_btn.setTransformationMethod(null);
@@ -269,5 +239,14 @@ public class ContactList extends AppCompatActivity {
         } catch (SecurityException ex) {
             System.out.println(ex);
         }
+    }
+
+    public void createToast(final String msg, final Context ctx) {
+        Handler handler = new Handler(ctx.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

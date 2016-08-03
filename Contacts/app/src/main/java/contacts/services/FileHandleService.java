@@ -38,17 +38,14 @@ public class FileHandleService {
 
 
     public boolean WriteToFile(String data, Context ctx, String filename) {
-        System.out.println("Write file from file handler");
         FileOutputStream outputStream;
         try {
             outputStream = ctx.openFileOutput(filename, ctx.MODE_PRIVATE);
             outputStream.write(data.getBytes());
             outputStream.close();
-            createToast("Contact list downloaded successfully", ctx);
             return true;
         } catch (Exception e) {
-            System.out.println("WriteToFile>>>>>" + e);
-            createToast("Unable to save data on device", ctx);
+            System.out.println("WriteToFile failed >>>>>" + e);
             return false;
         }
     }
@@ -68,7 +65,6 @@ public class FileHandleService {
             return text;
         } catch (IOException e) {
             System.out.println("exception ----------------> " + e);
-            createToast("Contact list missing. Please re-download", ctx);
             return null;
         }
     }
@@ -80,6 +76,5 @@ public class FileHandleService {
                 Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
             }
         });
-
     }
 }
