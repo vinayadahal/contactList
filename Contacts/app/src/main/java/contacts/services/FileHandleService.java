@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
+import contacts.components.MessageAlert;
+
 public class FileHandleService {
 
     public String ReadResponse(HttpURLConnection urlConnection, Context ctx) {
@@ -31,7 +33,7 @@ public class FileHandleService {
             return textData.toString();
         } catch (IOException | NullPointerException ex) {
             System.out.println("Caught Exception IO: " + ex);
-            createToast("Failed to connect server", ctx);
+            new MessageAlert().showToast("Failed to connect server", ctx);
             return null;
         }
     }
@@ -67,14 +69,5 @@ public class FileHandleService {
             System.out.println("exception ----------------> " + e);
             return null;
         }
-    }
-
-    public void createToast(final String msg, final Context ctx) {
-        Handler handler = new Handler(ctx.getMainLooper());
-        handler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }

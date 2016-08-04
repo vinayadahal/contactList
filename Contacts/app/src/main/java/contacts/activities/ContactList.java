@@ -3,11 +3,8 @@ package contacts.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatTextView;
@@ -25,20 +22,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import contacts.config.AppConfig;
+import contacts.components.MessageAlert;
+import contacts.components.Popup;
+import contacts.components.progressBar;
 import contacts.services.AutoCompleteService;
 import contacts.services.FileHandleService;
 import contacts.services.JsonToList;
-import contacts.services.NetworkService;
+import contacts.services.UrlService;
 
 public class ContactList extends AppCompatActivity {
 
@@ -50,10 +44,8 @@ public class ContactList extends AppCompatActivity {
     private FileHandleService objFileHandle = new FileHandleService();
     private AutoCompleteService autoCompleteService = new AutoCompleteService();
     private AppCompatAutoCompleteTextView autoComplete;
-    private LinearLayout.LayoutParams llp;
     private PopupWindow pw;
     private String filename = "Contacts";
-    AppConfig objAppConfig = new AppConfig();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,49 +100,30 @@ public class ContactList extends AppCompatActivity {
                 searchIcon.setVisible(true);
                 forwardIcon.setVisible(false);
                 closeIcon.setVisible(false);
-                StringBuilder contactData = objFileHandle.readFile(this, filename);
-                if (contactData == null) {
+                if (objFileHandle.readFile(this, filename) == null) {
                     return true;
                 }
-                createContactList(contactData);
+                createContactList(objFileHandle.readFile(this, filename));
                 return true;
             case R.id.action_bar_download:
-                ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    item.setActionView(progressBar);
+                progressBar objProgressBar = new progressBar();
+                objProgressBar.showProgressBar(this, item);
+                String serverResponse = objFileHandle.ReadResponse(new UrlService().urlGetContactList(this), this);
+                if (serverResponse == null) {
+                    objProgressBar.hideProgressBar();
+                    return true;
                 }
-                Map connectionDetails = new HashMap<>();
-                connectionDetails.put("url", objAppConfig.remoteServer);
-                connectionDetails.put("method", "GET");
-                connectionDetails.put("context", this);
-                connectionDetails.put("filename", filename);
-                NetworkService objNetworkService = new NetworkService();
-                try {
-                    HttpURLConnection objHttpConnection = objNetworkService.execute(connectionDetails).get(); //waits for execute to complete.
-                    String serverResponse = objFileHandle.ReadResponse(objHttpConnection, this);
-                    if (serverResponse == null) {
-                        return true;
-                    }
-                    if (objFileHandle.WriteToFile(serverResponse, this, "Contacts")) {
-                        createToast("Contact list downloaded successfully", this);
-                    } else {
-                        createToast("Unable to save data on device", this);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+                if (objFileHandle.WriteToFile(serverResponse, this, "Contacts")) {
+                    new MessageAlert().showToast("Contact list downloaded successfully", this);
+                } else {
+                    new MessageAlert().showToast("Unable to save data on device", this);
                 }
-
-                StringBuilder contactList = objFileHandle.readFile(this, filename);
-                if (contactList == null) {
-                    createToast("Contact list missing. Please re-download", this);
+                if (objFileHandle.readFile(this, filename) == null) {
+                    new MessageAlert().showToast("Contact list missing. Please re-download", this);
                     return false;
                 }
-                createContactList(contactList);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    item.setActionView(null);
-                }
+                createContactList(objFileHandle.readFile(this, filename));
+                objProgressBar.hideProgressBar();
                 return true;
             case R.id.action_go_btn:
                 searchContact(autoComplete.getText().toString());
@@ -194,14 +167,12 @@ public class ContactList extends AppCompatActivity {
 
     public void showPopUp(String username, String phone) {
         LinearLayout lnrlayout = (LinearLayout) findViewById(R.id.lnrLayout);
-        llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View choice_pop_up = inflater.inflate(R.layout.choice_pop_up, null, true);
         choiceButtons(choice_pop_up, username, phone);
-        pw = new PopupWindow(choice_pop_up, llp.width, llp.height, true);
-        pw.setBackgroundDrawable(new ColorDrawable()); //helped me to hide popup
-        pw.setOutsideTouchable(true);
-        pw.setTouchable(true);
+        Popup objPopup = new Popup();
+        pw = objPopup.showPopup(choice_pop_up, llp);
         pw.showAtLocation(lnrlayout, Gravity.CENTER, 0, 0);
     }
 
@@ -239,14 +210,5 @@ public class ContactList extends AppCompatActivity {
         } catch (SecurityException ex) {
             System.out.println(ex);
         }
-    }
-
-    public void createToast(final String msg, final Context ctx) {
-        Handler handler = new Handler(ctx.getMainLooper());
-        handler.post(new Runnable() {
-            public void run() {
-                Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }

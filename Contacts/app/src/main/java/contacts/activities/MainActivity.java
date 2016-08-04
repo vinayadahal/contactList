@@ -1,6 +1,5 @@
 package contacts.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,22 +7,21 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import contacts.config.AppConfig;
+import contacts.components.MessageAlert;
 import contacts.services.FileHandleService;
 import contacts.services.LoginService;
-import contacts.services.NetworkService;
+import contacts.services.UrlService;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    AppConfig objAppConfig = new AppConfig();
+    private FileHandleService objFileHandle = new FileHandleService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void login(View view) {
         LoginService objLoginService = new LoginService();
-
         if (!objLoginService.ConnectToServer()) {
-            createToast("Contact list downloaded successfully");
+            new MessageAlert().showToast("Contact list downloaded successfully", this);
             return;
         }
         EditText usernameEditText = (EditText) findViewById(R.id.editTextUsername);
@@ -46,32 +43,25 @@ public class MainActivity extends AppCompatActivity {
         String username = usernameEditText.getText().toString();
         String password = passwordEditText.getText().toString();
         if (username.isEmpty() || password.isEmpty()) {
-            createToast("Username or password cannot be empty");
+            new MessageAlert().showToast("Username or password cannot be empty", this);
             return;
         }
-
         Map args = new HashMap<>();
         args.put("username", username);
         args.put("password", password);
-
-        Map connectionDetails = new HashMap<>();
-        connectionDetails.put("url", objAppConfig.remoteServer + "/getdata.php");
-        connectionDetails.put("method", "POST");
-        connectionDetails.put("args", args);
-        NetworkService objNetworkService = new NetworkService();
-        try {
-            HttpURLConnection objHttpUrlConnection = objNetworkService.execute(connectionDetails).get();
-            if (objHttpUrlConnection == null) {
-                System.out.println("response is null");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        HttpURLConnection objHttpURLConnection = new UrlService().urlPostLogin(args);
+        if (objHttpURLConnection == null) {
+            System.out.println("response is null");
         }
-//        System.out.println("THE RESPONSE" + objNetworkInterface.serverResponse);
-        FileHandleService objFileHandle = new FileHandleService();
+        String serverResponse = objFileHandle.ReadResponse(objHttpURLConnection, this);
+        System.out.println("server Response:::::" + serverResponse);
         StringBuilder loginData = objFileHandle.readFile(this, "info");
+        if (loginData == null) {
+            objFileHandle.WriteToFile(serverResponse, this, "info");
+        }
+
+        System.out.println("File output>>>>>>>>>>>>>>>>>..." + objFileHandle.readFile(this, "info"));
+
 //        if (!objConnection.serverResponse) {
 //            createToast("Authentication Failed. Please re-login.");
 //        } else {
@@ -79,16 +69,9 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
+
     public void showContactList() {
         Intent intent = new Intent(MainActivity.this, ContactList.class);
         startActivity(intent);
-    }
-
-    public void createToast(String msg, Context ctx) {
-        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show();
-    }
-
-    public void createToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 }
