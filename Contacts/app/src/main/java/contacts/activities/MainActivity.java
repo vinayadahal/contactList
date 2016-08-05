@@ -8,10 +8,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import contacts.components.MessageAlert;
 import contacts.services.FileHandleService;
@@ -50,23 +59,37 @@ public class MainActivity extends AppCompatActivity {
         args.put("username", username);
         args.put("password", password);
         HttpURLConnection objHttpURLConnection = new UrlService().urlPostLogin(args);
-        if (objHttpURLConnection == null) {
-            System.out.println("response is null");
+        String serverResponse = null;
+        if (objHttpURLConnection != null) {
+            serverResponse = objFileHandle.ReadResponse(objHttpURLConnection, this);
         }
-        String serverResponse = objFileHandle.ReadResponse(objHttpURLConnection, this);
-        System.out.println("server Response:::::" + serverResponse);
-        StringBuilder loginData = objFileHandle.readFile(this, "info");
-        if (loginData == null) {
+
+        if (serverResponse != null) {
+            System.out.println(serverResponse + "<<<<<<<<<<<<<<<<");
+            if ("AuthFail".equals(serverResponse.trim())) {
+                new MessageAlert().showToast("Username or Password is incorrect.", this);
+                return;
+            }
             objFileHandle.WriteToFile(serverResponse, this, "info");
         }
-
-        System.out.println("File output>>>>>>>>>>>>>>>>>..." + objFileHandle.readFile(this, "info"));
-
-//        if (!objConnection.serverResponse) {
-//            createToast("Authentication Failed. Please re-login.");
-//        } else {
-        showContactList();
-//        }
+        StringBuilder loginData = objFileHandle.readFile(this, "info");
+        if (loginData == null || loginData.toString().isEmpty()) {
+            new MessageAlert().showToast("You need internet connection for first login", this);
+            return;
+        }
+        try {
+            JSONArray jArray = new JSONArray(loginData.toString());
+            for (int i = 0; i < jArray.length(); i++) {
+                JSONObject objJson = jArray.getJSONObject(i);
+                if ((objJson.getString("password").equals(new String(Hex.encodeHex(DigestUtils.md5(password)))))) { // cnverting password to md5 and comparing with json
+                    showContactList();
+                    return;
+                }
+            }
+            new MessageAlert().showToast("Authentication Failed. Please re-login.", this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 
