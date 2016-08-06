@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject objJson = jArray.getJSONObject(i);
                 if ((objJson.getString("password").equals(new String(Hex.encodeHex(DigestUtils.md5(password)))))) { // cnverting password to md5 and comparing with json
                     showContactList();
+                    this.finish();
                     return;
                 }
             }

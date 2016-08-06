@@ -48,10 +48,6 @@ public class AutoCompleteService {
         return autoComplete;
     }
 
-    public void TextChange(final Context ctx, final AppCompatAutoCompleteTextView autoComplete) {
-        showAutoCompleteDropDown(ctx, autoComplete);
-    }
-
     public void showAutoCompleteDropDown(final Context ctx, final AppCompatAutoCompleteTextView autoComplete) {
         StringBuilder text = objFileHandle.readFile(ctx, filename);
         if (text == null || text.equals("")) {

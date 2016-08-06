@@ -27,6 +27,7 @@ if(!empty($data)){
 header('Content-Type: application/json;charset=utf-8');
 echo json_encode($data);
 }
-//else{
-	//echo "Authentication FAILED"
-//}
+else{
+//	header('Content-Type: plain/text;charset=utf-8');
+	echo "AuthFail";
+}

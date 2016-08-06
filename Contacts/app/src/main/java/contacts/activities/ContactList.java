@@ -2,14 +2,17 @@ package contacts.activities;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +29,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import contacts.components.ConfirmBox;
 import contacts.components.MessageAlert;
 import contacts.components.Popup;
 import contacts.components.progressBar;
@@ -40,7 +44,7 @@ public class ContactList extends AppCompatActivity {
     private AppCompatTextView appCompatTextView;
     private MenuItem searchIcon;
     private MenuItem closeIcon;
-    private MenuItem forwardIcon;
+    private MenuItem checkIcon;
     private FileHandleService objFileHandle = new FileHandleService();
     private AutoCompleteService autoCompleteService = new AutoCompleteService();
     private AppCompatAutoCompleteTextView autoComplete;
@@ -55,10 +59,11 @@ public class ContactList extends AppCompatActivity {
         setSupportActionBar(Actionbar);
         getSupportActionBar().setTitle(null);
         View backBtn = findViewById(R.id.back_btn);
+        final Context ctx = this;
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                new ConfirmBox().showConfirmBox(ctx);
             }
         });
         StringBuilder contactData = objFileHandle.readFile(this, filename);
@@ -74,10 +79,19 @@ public class ContactList extends AppCompatActivity {
         inflater.inflate(R.menu.app_bar_btn, menu);
         closeIcon = menu.findItem(R.id.action_bar_close);
         closeIcon.setVisible(false);
-        forwardIcon = menu.findItem(R.id.action_go_btn);
-        forwardIcon.setVisible(false);
+        checkIcon = menu.findItem(R.id.action_go_btn);
+        checkIcon.setVisible(false);
         return true;
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            new ConfirmBox().showConfirmBox(this);
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -87,18 +101,23 @@ public class ContactList extends AppCompatActivity {
                 Actionbar.removeView(appCompatTextView);
                 autoComplete = new AppCompatAutoCompleteTextView(this);
                 autoComplete = autoCompleteService.EditTextStyler(autoComplete, Actionbar); // calls styler from autoCompleteService
-                autoCompleteService.TextChange(this, autoComplete); // calls textChange action from another class
+                autoCompleteService.showAutoCompleteDropDown(this, autoComplete); // calls textChange action from another class
                 Actionbar.addView(autoComplete);
                 searchIcon = item;
                 searchIcon.setVisible(false);
-                forwardIcon.setVisible(true);
+                autoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        checkIcon.setVisible(true);
+                    }
+                });
                 closeIcon.setVisible(true);
                 return true;
             case R.id.action_bar_close:
                 Actionbar.removeView(autoComplete);
                 Actionbar.addView(appCompatTextView);
                 searchIcon.setVisible(true);
-                forwardIcon.setVisible(false);
+                checkIcon.setVisible(false);
                 closeIcon.setVisible(false);
                 if (objFileHandle.readFile(this, filename) == null) {
                     return true;
